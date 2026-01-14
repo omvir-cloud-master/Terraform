@@ -1,117 +1,102 @@
-terraform {
-  required_providers {
-    aws = {
-      source  = "hashicorp/aws"
-      version = "~> 6.0"
-    }
-  }
-}
-
-
-provider "aws" {
-  region     = "ap-south-2"
-}
-
-#creating vpc
-resource "aws_vpc" "my_vpc" {
-  cidr_block       = "10.0.0.0/16"
-  instance_tenancy = "default"
+resource "aws_vpc" "dev_vpc" {
+  cidr_block           = "10.0.0.0/16"
+  enable_dns_hostnames = true
+  enable_dns_support   = true
 
   tags = {
-    Name = "tf-vpc"
+    Name = "dev_vpc_tf"
   }
 }
 
-#creating public subnet 
-resource "aws_subnet" "sub-1" {
-  vpc_id     = aws_vpc.my_vpc.id
-  cidr_block = "10.0.1.0/24"
+
+resource "aws_subnet" "dev_public_sub" {
+  vpc_id                  = aws_vpc.dev_vpc.id
+  cidr_block              = "10.0.1.0/24"
+  map_public_ip_on_launch = true
+  availability_zone       = "ap-south-1a"
 
   tags = {
-    Name = "tf-pub-sub-1"
+    Name = "dev_pub_sub_tf"
   }
 }
 
-resource "aws_subnet" "sub-2" {
-  vpc_id     = aws_vpc.my_vpc.id
-  cidr_block = "10.0.2.0/24"
+resource "aws_internet_gateway" "dev_igw" {
+  vpc_id = aws_vpc.dev_vpc.id
 
   tags = {
-    Name = "tf-pub-sub-2"
+    Name = "dev_igw_tf"
   }
 }
 
-#Creating Private subnet
-resource "aws_subnet" "sub-3" {
-  vpc_id     = aws_vpc.my_vpc.id
-  cidr_block = "10.0.3.0/24"
+
+resource "aws_route_table" "dev_route_tb" {
+  vpc_id = aws_vpc.dev_vpc.id
 
   tags = {
-    Name = "tf-priv-sub-1"
+    Name = "dev_public_rt_tf"
   }
 }
 
-resource "aws_subnet" "sub-4" {
-  vpc_id     = aws_vpc.my_vpc.id
-  cidr_block = "10.0.4.0/24"
-
-  tags = {
-    Name = "tf-priv-sub-2"
-  }
-}
-
-#creating internet gateway and attached to vpc
-resource "aws_internet_gateway" "gw-1" {
-  vpc_id = aws_vpc.my_vpc.id
-
-  tags = {
-    Name = "tf-igw"
-  }
-}
-
-#creating Public Route tables 
-resource "aws_route_table" "rtb1" {
-  vpc_id = aws_vpc.my_vpc.id
-
-  tags = {
-    Name = "tf-pub-rtb"
-  }
-}
-
-resource "aws_route_table" "rtb2" {
-  vpc_id = aws_vpc.my_vpc.id
-
-  tags = {
-    Name = "tf-priv-rtb"
-  }
-}
-
-
-resource "aws_route_table_association" "pub-1" {
-  subnet_id      = aws_subnet.sub-1.id
-  route_table_id = aws_route_table.rtb1.id
-}
-
-resource "aws_route_table_association" "pub-2" {
-  subnet_id      = aws_subnet.sub-2.id
-  route_table_id = aws_route_table.rtb1.id
-}
-
-
-resource "aws_route_table_association" "priv-1" {
-  subnet_id      = aws_subnet.sub-3.id
-  route_table_id = aws_route_table.rtb2.id
-}
-
-resource "aws_route_table_association" "priv-2" {
-  subnet_id      = aws_subnet.sub-4.id
-  route_table_id = aws_route_table.rtb2.id
-}
-
-resource "aws_route" "route" {
-  route_table_id         = aws_route_table.rtb1.id
+resource "aws_route" "dev_route1" {
+  route_table_id         = aws_route_table.dev_route_tb.id
   destination_cidr_block = "0.0.0.0/0"
-  gateway_id             = aws_internet_gateway.gw-1.id
+  gateway_id             = aws_internet_gateway.dev_igw.id
 }
 
+resource "aws_route_table_association" "dev_rt_asscoiation" {
+  subnet_id      = aws_subnet.dev_public_sub.id
+  route_table_id = aws_route_table.dev_route_tb.id
+}
+
+resource "aws_security_group" "dev_sg" {
+  name        = "dev_sg"
+  description = "dev security group"
+  vpc_id      = aws_vpc.dev_vpc.id
+
+  ingress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name = "dev"
+  }
+}
+
+
+resource "aws_key_pair" "dev-auth" {
+  key_name   = "dev-keypair"
+  public_key = file("~/.ssh/dev-keypair.pub")
+}
+
+resource "aws_instance" "dev_server" {
+  ami                    = "ami-02b8269d5e85954ef"
+  instance_type          = "t2.micro"
+  subnet_id              = aws_subnet.dev_public_sub.id
+  vpc_security_group_ids = [aws_security_group.dev_sg.id]
+  key_name               = aws_key_pair.dev-auth.id
+  user_data              = file("userdata.tpl")
+
+  root_block_device {
+    volume_size = 10
+    volume_type = "gp3"
+  }
+
+  tags = {
+    Name = "dev-vm-tf"
+    Env  = "dev"
+  }
+
+
+
+}
 
