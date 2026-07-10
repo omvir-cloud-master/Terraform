@@ -1,61 +1,80 @@
-variable "my_vpc_cidr" {
+variable "vpc_cidr" {
   type        = string
-  description = "vpc cidr"
+  description = "vpc cidr (the total pool of private IP addresses assigned to that cloud network)"
   default     = "10.0.0.0/16"
 }
 
 
-variable "my_vpc_name" {
+variable "vpc_name" {
   type        = string
   description = "vpc name"
   default     = "dev_vpc_tf"
 }
 
 
-variable "my_pub_sub_cidr" {
+variable "pub_sub_cidr" {
   type        = string
   description = "Public subnet cidr"
   default     = "10.0.1.0/24"
 }
 
 
-variable "my_pub_sub_az" {
+variable "pub_sub_az" {
   type        = string
   description = "Public subnet az"
   default     = "ap-south-1a"
 }
 
 
-variable "my_pub_sub_name" {
+variable "pub_sub_name" {
   type        = string
   description = "public subnet name"
-  default     = "dev_pub_sub_tf"
+  default     = "pub_sub_tf"
 }
 
 
-variable "my_private_sub_cidr" {
+variable "private_sub_cidr" {
   type        = string
   description = "Private subnet cidr"
   default     = "10.0.4.0/24"
 }
 
 
-variable "my_private_sub_az" {
+variable "private_sub_az" {
   type        = string
   description = "Private subnet az"
   default     = "ap-south-1b"
 }
 
 
-variable "my_private_sub_name" {
+variable "private_sub_name" {
   type        = string
   description = "Private subnet name"
   default     = "dev_private_sub_tf"
 }
 
 
-variable "my_igw_name" {
+variable "igw_name" {
   type        = string
-  description = "internet gateway subnet name"
+  description = "internet gateway name"
   default     = "igw_tf"
+}
+
+variable "rtb_name" {
+  type        = string
+  description = "internet route table  name"
+  default     = "rtb_tf"
+}
+
+
+variable "sg_tag_name" {
+  type        = string
+  description = "security group tags name"
+  default     = "sg_tf"
+}
+
+variable "sg_name" {
+  type        = string
+  description = "security group  name"
+  default     = "sg_tf"
 }

@@ -1,0 +1,13 @@
+vpc_cidr         = "192.168.0.0/16"
+vpc_name         = "dev_vpc"
+pub_sub_cidr     = "192.168.1.0/24"
+pub_sub_az       = "ap-south-1b"
+pub_sub_name     = "dev_public_subnet"
+private_sub_cidr = "192.168.2.0/24"
+private_sub_az   = "ap-south-1c"
+private_sub_name = "dev_private_subnet"
+igw_name         = "dev_igw"
+rtb_name         = "dev_rtb"
+sg_tag_name      = "dev_sg"
+sg_name          = "dev_sg"
+

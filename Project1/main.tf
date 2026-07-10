@@ -1,37 +1,18 @@
 module "my_vpc" {
-  # The relative path to the child module folder
-  source = "./modules/vpc"
-
-  # Pass any required input variables expected by the child module
-  # bucket_name = "my-unique-storage-bucket-name"
-  # environment = "production"
+  source           = "./modules/vpc"
+  vpc_name         = var.vpc_name
+  vpc_cidr         = var.vpc_cidr
+  pub_sub_name     = var.pub_sub_name
+  pub_sub_cidr     = var.pub_sub_cidr
+  pub_sub_az       = var.pub_sub_az
+  private_sub_name = var.private_sub_name
+  private_sub_cidr = var.private_sub_cidr
+  private_sub_az   = var.private_sub_az
+  igw_name         = var.igw_name
+  rtb_name         = var.rtb_name
+  sg_name          = var.sg_name
+  sg_tag_name      = var.sg_tag_name
 }
 
 
 
-# resource "aws_key_pair" "dev-auth" {
-#   key_name   = "dev-keypair"
-#   public_key = file("~/.ssh/dev-keypair.pub")
-# }
-
-# resource "aws_instance" "dev_server" {
-#   ami                    = "ami-02b8269d5e85954ef"
-#   instance_type          = "t2.micro"
-#   subnet_id              = aws_subnet.dev_public_sub.id
-#   vpc_security_group_ids = [aws_security_group.dev_sg.id]
-#   key_name               = aws_key_pair.dev-auth.id
-#   user_data              = file("userdata.tpl")
-
-#   root_block_device {
-#     volume_size = 10
-#     volume_type = "gp3"
-#   }
-
-#   tags = {
-#     Name = "dev-vm-tf"
-#     Env  = "dev"
-#   }
-
-
-
-# }
