@@ -23,7 +23,7 @@ resource "aws_subnet" "public_sub" {
 resource "aws_subnet" "private_sub" {
   vpc_id                  = aws_vpc.dev_vpc.id
   cidr_block              = var.my_private_sub_cidr
-  map_public_ip_on_launch = false
+  map_public_ip_on_launch = false  
   availability_zone       = var.my_private_sub_az
 
   tags = {
