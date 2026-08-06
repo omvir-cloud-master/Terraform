@@ -1,0 +1,46 @@
+digraph G {
+  rankdir = "RL";
+  node [shape = rect, fontname = "sans-serif"];
+  subgraph "cluster_module.VPC" {
+    label = "module.VPC"
+    fontname = "sans-serif"
+    "module.VPC.aws_internet_gateway.igw" [label="aws_internet_gateway.igw"];
+    "module.VPC.aws_route.route1" [label="aws_route.route1"];
+    "module.VPC.aws_route_table.priv_route_tb" [label="aws_route_table.priv_route_tb"];
+    "module.VPC.aws_route_table.pub_route_tb" [label="aws_route_table.pub_route_tb"];
+    "module.VPC.aws_route_table_association.priv_rt_asscoiation" [label="aws_route_table_association.priv_rt_asscoiation"];
+    "module.VPC.aws_route_table_association.pub_rt_asscoiation" [label="aws_route_table_association.pub_rt_asscoiation"];
+    "module.VPC.aws_security_group.backend_sg" [label="aws_security_group.backend_sg"];
+    "module.VPC.aws_security_group.frontend_sg" [label="aws_security_group.frontend_sg"];
+    "module.VPC.aws_subnet.private_sub" [label="aws_subnet.private_sub"];
+    "module.VPC.aws_subnet.public_sub" [label="aws_subnet.public_sub"];
+    "module.VPC.aws_vpc.vpc" [label="aws_vpc.vpc"];
+  }
+  subgraph "cluster_module.backend" {
+    label = "module.backend"
+    fontname = "sans-serif"
+    "module.backend.aws_instance.backend" [label="aws_instance.backend"];
+  }
+  subgraph "cluster_module.frontend" {
+    label = "module.frontend"
+    fontname = "sans-serif"
+    "module.frontend.aws_instance.frontend" [label="aws_instance.frontend"];
+  }
+  "module.VPC.aws_internet_gateway.igw" -> "module.VPC.aws_vpc.vpc";
+  "module.VPC.aws_route.route1" -> "module.VPC.aws_internet_gateway.igw";
+  "module.VPC.aws_route.route1" -> "module.VPC.aws_route_table.pub_route_tb";
+  "module.VPC.aws_route_table.priv_route_tb" -> "module.VPC.aws_vpc.vpc";
+  "module.VPC.aws_route_table.pub_route_tb" -> "module.VPC.aws_vpc.vpc";
+  "module.VPC.aws_route_table_association.priv_rt_asscoiation" -> "module.VPC.aws_route_table.priv_route_tb";
+  "module.VPC.aws_route_table_association.priv_rt_asscoiation" -> "module.VPC.aws_subnet.private_sub";
+  "module.VPC.aws_route_table_association.pub_rt_asscoiation" -> "module.VPC.aws_route_table.pub_route_tb";
+  "module.VPC.aws_route_table_association.pub_rt_asscoiation" -> "module.VPC.aws_subnet.public_sub";
+  "module.VPC.aws_security_group.backend_sg" -> "module.VPC.aws_security_group.frontend_sg";
+  "module.VPC.aws_security_group.frontend_sg" -> "module.VPC.aws_vpc.vpc";
+  "module.VPC.aws_subnet.private_sub" -> "module.VPC.aws_vpc.vpc";
+  "module.VPC.aws_subnet.public_sub" -> "module.VPC.aws_vpc.vpc";
+  "module.backend.aws_instance.backend" -> "module.VPC.aws_security_group.backend_sg";
+  "module.backend.aws_instance.backend" -> "module.VPC.aws_subnet.private_sub";
+  "module.frontend.aws_instance.frontend" -> "module.VPC.aws_security_group.frontend_sg";
+  "module.frontend.aws_instance.frontend" -> "module.VPC.aws_subnet.public_sub";
+}
